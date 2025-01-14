@@ -1,10 +1,11 @@
 
 import bcrypt
 from flask import Blueprint, jsonify, request, session
+from flask_migrate import current
 from backend  import db , bcrypt
-from backend .auth.models import User
-from flask_login import login_user, logout_user 
-
+from backend .auth.models import Resources, Role, User
+from flask_login import current_user, login_required, login_user, logout_user , current_user
+ 
 
 auth = Blueprint('auth' , __name__)
 
@@ -25,7 +26,7 @@ def login() :
                     return jsonify({"Message" : "Connexion établie"}) , 201
             else :
                 print('utlisateur non exisitant')
-                return jsonify({"erreur " : "Utlisateur non existant"}), 401
+                return jsonify({"erreur " : "Utlisateur non existant"}), 404
             
         except Exception as e : 
             db.session.rollback()
@@ -38,7 +39,7 @@ def signup() :
         try : 
             data = request.json
 
-            field = [name , email , password]
+            field = ["name" , "email" , "password"]
 
             for champ in field : 
                 if champ not in data : 
@@ -68,12 +69,14 @@ def signup() :
             db.session.commit()
 
             print('User has benn created')
-            return jsonify({"message" : "User has been created"}) , 201
+            return jsonify({"message" : "utlisateur a bien été crée"}) , 201
         
         except Exception as e : 
             db.session.rollback()
             print('Erreur serveur :  ' , str(e))
             return jsonify({'Erreur ' : str(e)}) ,500 
+        
+        
         
 @auth.route('/api/auth/logout' ,methods =['POST'])
 def logout(): 
@@ -90,5 +93,136 @@ def logout():
         return jsonify({"message" : str(e)})
 
 
-        
+@auth.route('/api/auth/profile' , methods= ['GET' , 'POST'])
+@login_required
+def getProfile() :
+    if request.method == "GET" : 
+        try : 
+            user_data = current_user.to_json()
+            if user_data  : 
+                return jsonify(user_data)
+
+            return jsonify({"message" : "user non trouvé"}) , 404
+        except Exception as e: 
+            db.session.rollback()
+            print('Erreur serveur '  , str(e))
+            return jsonify({
+                'Erreur server' : str(e) 
+            })     
+
+
+
+@auth.route('/api/auth/admin' , methods = ['POST'])
+def install_config() : 
+    if request.method == "POST" : 
+        data = request.json 
+
+       
+        admin_name  = data.get('admin_name')
+        admin_email = data.get('admin_email')
+        admin_password = data.get('admin_password')
+
+        try : 
+
+            hashed_password = bcrypt.generate_password_hash(admin_password).decode('utf-8')
+            session['admin_name'] = admin_name
+            session['admin_email'] = admin_email
+            session['admin_password'] = hashed_password
+
+            empty_setup()
+            db.session.commit()
+
+            print('Nouvel admin installé ')
+            return jsonify({"message" : "Nouvelle utilisateur installé"}) , 201 
             
+        except Exception as e: 
+            db.session.rollback()
+            print('Erreur serveur : ' , str (e))
+            return jsonify({
+                "Erreur serveur"  : str (e)
+            }) , 500
+        
+
+    
+def empty_setup():
+    # create system roles & resources
+    role = Role(name='admin')
+    
+    role.resources.append(
+        Resources(
+            name='staff',
+            can_view=True,
+            can_edit=False,
+            can_create=False,
+            can_delete=False
+        )
+    )
+
+    role.resources.append(
+        Resources(
+            name='leads',
+            can_view=True,
+            can_edit=False,
+            can_create=True,
+            can_delete=False
+        )
+    )
+
+    role.resources.append(
+        Resources(
+            name='accounts',
+            can_view=True,
+            can_edit=False,
+            can_create=True,
+            can_delete=False
+        )
+    )
+
+    role.resources.append(
+        Resources(
+            name='contacts',
+            can_view=True,
+            can_edit=True,
+            can_create=True,
+            can_delete=False
+        )
+    )
+
+    role.resources.append(
+        Resources(
+            name='deals',
+            can_view=True,
+            can_edit=False,
+            can_create=True,
+            can_delete=False
+        )
+    )
+
+    user = User(name =session['admin_name'],
+                email=session['admin_email'],
+                password=session['admin_password'],
+                is_admin=True,
+                is_first_login=True,
+                is_user_active=True
+                )
+    
+
+
+    db.session.add(role)
+    db.session.add(user)
+
+
+            
+
+        
+@auth.route('/api/refresh-token' , methods=['POST'])
+def refreshToken() : 
+    if request.method == "POST" : 
+        try :
+            pass 
+        except Exception as e : 
+            print('Erreur console : ' ,str(e))
+            return jsonify({'Erreur'  : str(e)}) , 500
+      
+
+        

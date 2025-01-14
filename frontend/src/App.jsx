@@ -5,6 +5,7 @@ import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import AdminPage from "./pages/AdminPage";
 import CategoryPage from "./pages/CategoryPage";
+// import AdminLogin from "./pages/AdminLogin";
 
 import Navbar from "./components/Navbar";
 import { Toaster } from "react-hot-toast";
@@ -18,7 +19,9 @@ import PurchaseCancelPage from "./pages/PurchaseCancelPage";
 
 function App() {
 	const { user, checkAuth, checkingAuth } = useUserStore();
+
 	const { getCartItems } = useCartStore();
+	
 	useEffect(() => {
 		checkAuth();
 	}, [checkAuth]);
@@ -46,11 +49,14 @@ function App() {
 					<Route path='/' element={<HomePage />} />
 					<Route path='/signup' element={!user ? <SignUpPage /> : <Navigate to='/' />} />
 					<Route path='/login' element={!user ? <LoginPage /> : <Navigate to='/' />} />
-					<Route path='/secret-dashboard'element={user?.role === "admin" ? <AdminPage /> : <Navigate to='/login' />}/>
+					<Route path='/secret-dashboard'element={user?.is_admin ==  1 ? <AdminPage /> : <Navigate to='/login' />}/>
+					<Route path='/secret-dashboard'element={ <AdminPage />}/>
 					<Route path='/category/:category' element={<CategoryPage />} />
 					<Route path='/cart' element={user ? <CartPage /> : <Navigate to='/login' />} />
 					<Route path='/purchase-success' element={user ? <PurchaseSuccessPage /> : <Navigate to='/login' />}/>
 					<Route path='/purchase-cancel' element={user ? <PurchaseCancelPage /> : <Navigate to='/login' />} />
+
+					{/* <Route path='/admin'  element = {!user ? <AdminLogin/> : <Navigate to="/"/> } /> */}
 				</Routes>
 			</div>
 			<Toaster />

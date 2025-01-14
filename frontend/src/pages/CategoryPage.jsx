@@ -34,12 +34,12 @@ const CategoryPage = () => {
 				>
 					{products?.length === 0 && (
 						<h2 className='text-3xl font-semibold text-gray-300 text-center col-span-full'>
-							No products found
+							Produit Non Trouvé 
 						</h2>
 					)}
 
 					{products?.map((product) => (
-						<ProductCard key={product._id} product={product} />
+						<ProductCard key={product.id} product={product} />
 					))}
 				</motion.div>
 			</div>

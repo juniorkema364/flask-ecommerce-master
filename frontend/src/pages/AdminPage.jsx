@@ -19,7 +19,7 @@ const AdminPage = () => {
 
 	useEffect(() => {
 		fetchAllProducts();
-	}, [fetchAllProducts]);
+	}, [fetchAllProducts]); 
 
 	return (
 		<div className='min-h-screen relative overflow-hidden'>
@@ -30,7 +30,7 @@ const AdminPage = () => {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8 }}
 				>
-					Admin Dashboard
+					Page admin
 				</motion.h1>
 
 				<div className='flex justify-center mb-8'>

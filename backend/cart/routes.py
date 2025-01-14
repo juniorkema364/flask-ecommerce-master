@@ -43,7 +43,7 @@ def get_cart_products():
             print("Error in get_cart_products controller", str(e))
             return jsonify({"message": "Server error", "error": str(e)}), 500
  
-@cart.route('/api/cart/add', methods = ['POST'])
+@cart.route('/api/cart/', methods = ['POST'])
 @login_required 
 def addToCart():
     if request.method == "POST" :
@@ -97,14 +97,14 @@ def removeAllFormCart(product_id) :
                 return jsonify({"message" : "Elmement supprimé avec succes"})
             else : 
                 print('Votre panier est vide')
-                return jsonify({"message" : "Votre panier est vide"})
+                return jsonify({"message" : "Votre panier est vide ah ah "})
             
         except Exception as e : 
             db.session.rollback()
             print("Error in get_cart_products controller", str(e))
             return jsonify({"message": "Server error", "error": str(e)}), 500
         
-@cart.route('/api/cart/update/<int:product_id>', methods=['PUT'])
+@cart.route('/api/cart/<int:product_id>', methods=['PUT'])
 @login_required
 def update_quantity(product_id):
     if request.method == 'PUT' :
@@ -119,7 +119,7 @@ def update_quantity(product_id):
                 cart_item = CartItems.query.filter_by(user_id=current_user.id, product_id=product_id).first()
 
                 if not cart_item:
-                    return jsonify({"message": "Votre panier est vide"}), 404
+                    return jsonify({"message": "Votre panier est vide man"}), 404
 
                 if quantity == 0:
                         

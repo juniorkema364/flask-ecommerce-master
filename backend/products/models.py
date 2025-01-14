@@ -7,7 +7,7 @@ class Product(db.Model) :
     price = db.Column(db.Integer , nullable = False)
     image = db.Column(db.String(255), nullable = False)
     category = db.Column(db.String(255) , nullable = False )
-    isfeatured = db.Column(db.String(255), default = False )
+    isfeatured = db.Column(db.Boolean, default = False )
      
 
 
@@ -17,7 +17,7 @@ class Product(db.Model) :
     def to_json(self) : 
         return ({
             "id" : self.id , 
-            "name" :self.id , 
+            "name" :self.name , 
             "description" : self.description , 
             "price" :self.price ,
             "image" :self.image , 

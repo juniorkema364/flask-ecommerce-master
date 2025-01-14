@@ -10,14 +10,19 @@ export const useProductStore = create((set) => ({
 	createProduct: async (productData) => {
 		set({ loading: true });
 		try {
-			const res = await axios.post("/products", productData);
+			const res = await axios.post("/products", productData ,  {
+				headers: { 'Content-Type': 'application/json' },
+				
+			});
 			set((prevState) => ({
 				products: [...prevState.products, res.data],
 				loading: false,
 			}));
+			toast.success('Produit ajouté avec succes ! ')
 		} catch (error) {
-			toast.error(error.response.data.error);
-			set({ loading: false });
+			
+		toast.error(error.message);
++			set({ loading: false });
 		}
 	},
 	fetchAllProducts: async () => {
@@ -28,39 +33,46 @@ export const useProductStore = create((set) => ({
 		} catch (error) {
 			set({ error: "Failed to fetch products", loading: false });
 			toast.error(error.response.data.error || "Failed to fetch products");
-		}
+		} 
 	},
+
 	fetchProductsByCategory: async (category) => {
 		set({ loading: true });
 		try {
-			const response = await axios.get(`/products/category/${category}`);
-			set({ products: response.data.products, loading: false });
+			const response = await axios.get(`/products/category/${category}` , {
+				headers: { 'Content-Type': 'application/json' },
+			});
+			set({ products: response.data, loading: false });
+			console.log(response.data)
 		} catch (error) {
 			set({ error: "Failed to fetch products", loading: false });
 			toast.error(error.response.data.error || "Failed to fetch products");
 		}
 	},
-	deleteProduct: async (productId) => {
+
+
+	deleteProduct: async (product_id) => {
 		set({ loading: true });
 		try {
-			await axios.delete(`/products/${productId}`);
+			await axios.delete(`/products/${product_id}`);
 			set((prevProducts) => ({
-				products: prevProducts.products.filter((product) => product._id !== productId),
-				loading: false,
+				products: prevProducts.products.filter((product) => product.id !== product_id),
+				loading: false
+
 			}));
 		} catch (error) {
 			set({ loading: false });
 			toast.error(error.response.data.error || "Failed to delete product");
 		}
 	},
-	toggleFeaturedProduct: async (productId) => {
+	toggleFeaturedProduct: async (product_id) => {
 		set({ loading: true });
 		try {
-			const response = await axios.patch(`/products/${productId}`);
+			const response = await axios.patch(`/products/${product_id}`);
 			// this will update the isFeatured prop of the product
 			set((prevProducts) => ({
 				products: prevProducts.products.map((product) =>
-					product._id === productId ? { ...product, isFeatured: response.data.isFeatured } : product
+					product.id === product_id ? { ...product, isFeatured: response.data.isFeatured } : product
 				),
 				loading: false,
 			}));

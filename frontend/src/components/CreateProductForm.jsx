@@ -9,9 +9,9 @@ const CreateProductForm = () => {
 	const [newProduct, setNewProduct] = useState({
 		name: "",
 		description: "",
-		price: "",
+		price: "", 
 		category: "",
-		image: "",
+		image: "",  
 	});
 
 	const { createProduct, loading } = useProductStore();
@@ -21,8 +21,9 @@ const CreateProductForm = () => {
 		try {
 			await createProduct(newProduct);
 			setNewProduct({ name: "", description: "", price: "", category: "", image: "" });
-		} catch {
+		} catch(error) {
 			console.log("error creating a product");
+			console.log(error);
 		}
 	};
 

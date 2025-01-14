@@ -1,5 +1,7 @@
 from flask_login import UserMixin
 from backend  import db , login_manager
+from backend.cart.models import CartItems
+
 
 @login_manager.user_loader 
 def load_user(id) :
@@ -10,20 +12,22 @@ class User(db.Model , UserMixin):
     name = db.Column(db.String(200) , nullable = False)
     email = db.Column(db.String(255) , unique = True  , nullable = False )
     password = db.Column(db.Integer, nullable = False)
-
-    cartItems = db.relationship('CartItems', backref='user', lazy=True)
     role_id = db.Column(db.Integer ,  db.ForeignKey('role.id' ,ondelete = "SET NULL") ,nullable= True)
     is_admin  = db.Column(db.Boolean , nullable = False , default = False)
+    is_first_login = db.Column(db.Boolean , nullable = False, default = True)
+    is_user_active = db.Column(db.Boolean , nullable = False ,  default = False)
 
-            
-            
+    cartItems = db.relationship('CartItems', backref='user', lazy=True)
+
+
+ 
+
     def to_json(self) : 
         return({
             "id": self.id , 
             "name" : self.name , 
             "email" : self.email , 
             'password' : self.password ,
-            "cartitems": self.cartItems , 
             "role_id" : self.role_id , 
             "is_admin" : self.is_admin , 
         })
@@ -64,5 +68,5 @@ class Resources(db.Model):
     can_view = db.Column(db.Boolean , nullable = False )
     can_edit = db.Column(db.Boolean , nullable = False )
     can_create = db.Column(db.Boolean , nullable = False )
-    can_view = db.Column(db.Boolean , nullable = False )
+    can_delete = db.Column(db.Boolean , nullable = False )
     

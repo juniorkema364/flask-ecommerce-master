@@ -8,7 +8,7 @@ const ProductCard = ({ product }) => {
 	const { addToCart } = useCartStore();
 	const handleAddToCart = () => {
 		if (!user) {
-			toast.error("Please login to add products to cart", { id: "login" });
+			toast.error("Veillez vous conecter", { id: "login" });
 			return;
 		} else {
 			// add to cart
@@ -39,7 +39,7 @@ const ProductCard = ({ product }) => {
 					Add to cart
 				</button>
 			</div>
-		</div>
+		</div> 
 	);
 };
 export default ProductCard;

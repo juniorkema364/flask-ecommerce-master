@@ -31,7 +31,7 @@ export const useCartStore = create((set, get) => ({
 		set({ coupon: null, isCouponApplied: false });
 		get().calculateTotals();
 		toast.success("Coupon removed");
-	},
+	} , 
 
 	getCartItems: async () => {
 		try {
@@ -48,37 +48,50 @@ export const useCartStore = create((set, get) => ({
 	},
 	addToCart: async (product) => {
 		try {
-			await axios.post("/cart", { product_id: product._id });
-			toast.success("Product added to cart");
-
+			 
+			await axios.post("/cart", { product_id: product.id });
+			toast.success("Produit ajouté avec succes");
+	
+	 
 			set((prevState) => {
-				const existingItem = prevState.cart.find((item) => item._id === product._id);
-				const newCart = existingItem
+				 
+				const existingItem = prevState.cart.find((item) => item.id === product.id);
+	
+				 
+				const updatedCart = existingItem
 					? prevState.cart.map((item) =>
-							item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+							item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
 					  )
 					: [...prevState.cart, { ...product, quantity: 1 }];
-				return { cart: newCart };
+	
+				 
+				return { cart: updatedCart };
 			});
+	
+			 
 			get().calculateTotals();
 		} catch (error) {
-			toast.error(error.response.data.message || "An error occurred");
+			 
+			toast.error(error.response?.data || "An error occurred");
+			console.log(product.id)
 		}
 	},
+	
 	removeFromCart: async (product_id) => {
 		try {
-			// Envoyer une requête DELETE avec product_id
+			 
 			await axios.delete(`/cart/${product_id}`);
+			toast.success('produit supprimé avec succes')
 	
-			// Mettre à jour le state local pour supprimer le produit
+			 
 			set((prevState) => ({
-				cart: prevState.cart.filter((item) => item._id !== product_id),
+				cart: prevState.cart.filter((item) => item.id !== product_id),
 			}));
 	
-			// Recalculer les totaux du panier
+			 
 			get().calculateTotals();
 		} catch (error) {
-			// Gérer les erreurs avec une notification ou un journal
+			 
 			console.error("Erreur lors de la suppression du produit du panier :", error);
 			toast.error("Impossible de supprimer le produit du panier. Veuillez réessayer.");
 		}
@@ -91,7 +104,7 @@ export const useCartStore = create((set, get) => ({
 
 		await axios.put(`/cart/${product_id}`, { quantity });
 		set((prevState) => ({
-			cart: prevState.cart.map((item) => (item._id === product_id ? { ...item, quantity } : item)),
+			cart: prevState.cart.map((item) => (item.id === product_id ? { ...item, quantity } : item)),
 		}));
 		get().calculateTotals();
 	},
